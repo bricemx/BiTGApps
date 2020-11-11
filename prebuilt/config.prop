@@ -1,0 +1,12 @@
+#
+# ADDITIONAL BITGAPPS BUILD PROPERTIES
+#
+# During installation additional build properties will be
+# written to this file and used by OTA survival script at
+# 'backup' 'restore' and 'post-restore' stage
+
+# Begin build properties
+# End build properties
+
+# Begin addon properties
+# End addon properties

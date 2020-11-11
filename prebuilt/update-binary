@@ -50,7 +50,9 @@ fi;
 
 # Set environmental variables in the global environment
 export ZIPFILE="$3"
+# ZIPTYPE variable 'basic' or 'addon'
 export ZIPTYPE=""
+# ADDON variable 'conf' or 'sep'
 export ADDON=""
 export OUTFD="$OUTFD"
 export TMP="/tmp"
@@ -60,10 +62,9 @@ export EXTERNAL="/sdcard1"
 export TARGET_ANDROID_SDK=""
 # Supported Android platforms ARM & ARM64
 export TARGET_ANDROID_ARCH=""
-# Set addon for installation, according to variable $ADDON
+# Set addon for installation
 if [ "$ZIPTYPE" == "addon" ]; then
   if [ "$ADDON" == "sep" ]; then
-    export TARGET_ASSISTANT_GOOGLE=""
     export TARGET_CALCULATOR_GOOGLE=""
     export TARGET_CALENDAR_GOOGLE=""
     export TARGET_CONTACTS_GOOGLE=""
@@ -74,35 +75,13 @@ if [ "$ZIPTYPE" == "addon" ]; then
     export TARGET_MESSAGES_GOOGLE=""
     export TARGET_PHOTOS_GOOGLE=""
     export TARGET_SOUNDPICKER_GOOGLE=""
+    export TARGET_ASSISTANT_GOOGLE=""
     export TARGET_WELLBEING_GOOGLE=""
+    export TARGET_VANCED_GOOGLE=""
   fi;
 fi;
-# Set build info
-export PKG="BiTGApps"
-export ARCH="$TARGET_ANDROID_ARCH"
-export DATE=""
-export ID=""
-export AUTH="TheHitMan @ xda-developers"
-if [ "$TARGET_ANDROID_SDK" == "30" ]; then
-  export VER="11.0.0"
-  export VER_SDK="30"
-fi;
-if [ "$TARGET_ANDROID_SDK" == "29" ]; then
-  export VER="10.0.0"
-  export VER_SDK="29"
-fi;
-if [ "$TARGET_ANDROID_SDK" == "28" ]; then
-  export VER="9.0.0"
-  export VER_SDK="28"
-fi;
-if [ "$TARGET_ANDROID_SDK" == "27" ]; then
-  export VER="8.1.0"
-  export VER_SDK="27"
-fi;
-if [ "$TARGET_ANDROID_SDK" == "25" ]; then
-  export VER="7.1.2"
-  export VER_SDK="25"
-fi;
+# Set build version
+REL=""
 
 ui_print() {
   echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
@@ -113,7 +92,7 @@ ui_print() {
 bb="$TMP/busybox-arm"
 l="$TMP/bin"
 
-# Extract zip files, according to variable $ZIPTYPE
+# Extract zip files
 if [ "$ZIPTYPE" == "addon" ]; then
   for f in busybox-arm installer.sh; do
     unzip -o "$ZIPFILE" "$f" -d "$TMP";
@@ -121,39 +100,39 @@ if [ "$ZIPTYPE" == "addon" ]; then
   for f in busybox-arm installer.sh; do
     chmod +x "$TMP/$f";
   done
-else
-  for f in addon.sh busybox-arm curl data.prop g.prop init.bootlog.rc installer.sh pm.sh sqlite3 zipalign; do
+fi;
+if [ "$ZIPTYPE" == "basic" ]; then
+  for f in busybox-arm config.prop data.prop g.prop installer.sh pm.sh sqlite3 zipalign; do
     unzip -o "$ZIPFILE" "$f" -d "$TMP";
   done
-  for f in busybox-arm installer.sh zipalign; do
+  for f in busybox-arm installer.sh sqlite3 zipalign; do
     chmod +x "$TMP/$f";
   done
 fi;
 
-ui_print "***********************************************";
-ui_print "Custom GApps Package : BiTGApps                ";
-ui_print "Developed By         : TheHitMan               ";
-ui_print "***********************************************";
-
 ui_print " ";
 
-ui_print "Installing toolbox";
+ui_print "************************";
+ui_print " BiTGApps $REL Installer";
+ui_print "************************";
+
+ui_print "- Installing toolbox";
 if [ -e "$bb" ]; then
   install -d "$l"
   for i in $($bb --list); do
     if ! ln -sf "$bb" "$l/$i" && ! $bb ln -sf "$bb" "$l/$i" && ! $bb ln -f "$bb" "$l/$i" ; then
       # create script wrapper if symlinking and hardlinking failed because of restrictive selinux policy
       if ! echo "#!$bb" > "$l/$i" || ! chmod +x "$l/$i" ; then
-        ui_print "ERROR 10: Failed to set-up pre-bundled busybox";
+        ui_print "ERROR: Failed to set-up pre-bundled busybox";
         exit 1
       fi;
     fi;
   done
 else
-  ui_print "No match found !";
+  ui_print "! No match found. Aborting...";
   exit 1
 fi;
 
-ui_print " ";
-
 PATH="$l:$PATH" $bb ash "$TMP/installer.sh" "$@" || exit "$?"
+
+sync;

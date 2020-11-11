@@ -4,16 +4,15 @@
 	
 This list is unified across supported Android Versions
 
+	• AndroidMigratePrebuilt
 	• Facelock
+	• GmsCoreSetupPrebuilt
 	• GoogleBackupTransport
 	• GoogleRestore
 	• GoogleSetupWizard
-	• GoogleLoginService
 	• GoogleCalendarSyncAdapter
 	• GoogleContactsSyncAdapter
 	• GoogleExtShared
-	• MarkupGoogle
-	• SoundPickerPrebuilt
 	• ConfigUpdater
 	• GoogleExtServices
 	• GoogleLoginService

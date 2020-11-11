@@ -35,3 +35,4 @@ ro.config.photos=false
 ro.config.soundpicker=false
 ro.config.assistant=false
 ro.config.wellbeing=false
+ro.config.vanced=false
